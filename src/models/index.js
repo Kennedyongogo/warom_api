@@ -1,584 +1,199 @@
 const { sequelize } = require("../config/database");
 
-// Import all models
-const AdminUser = require("./adminUser")(sequelize);
-const PublicUser = require("./publicUser")(sequelize);
-const TokenTransaction = require("./tokenTransaction")(sequelize);
-const ChatUnlock = require("./chatUnlock")(sequelize);
-const PremiumVerification = require("./premiumVerification")(sequelize);
-const MarketItem = require("./marketItem")(sequelize);
-const LookingForPost = require("./lookingForPost")(sequelize);
-const Favourite = require("./favourite")(sequelize);
-const Payment = require("./payment")(sequelize);
-const Subscription = require("./subscription")(sequelize);
-const SubscriptionUsage = require("./subscriptionUsage")(sequelize);
-const Notification = require("./notification")(sequelize);
-const ProfileView = require("./profileView")(sequelize);
-const Report = require("./report")(sequelize);
-const ProfileTag = require("./profileTag")(sequelize);
-const ProfileBoost = require("./profileBoost")(sequelize);
-const AccountSuspension = require("./accountSuspension")(sequelize);
-const SuspensionMessage = require("./suspensionMessage")(sequelize);
-const Story = require("./story")(sequelize);
-const StoryView = require("./storyView")(sequelize);
-const StoryReaction = require("./storyReaction")(sequelize);
-const StoryComment = require("./storyComment")(sequelize);
-const StoryHighlight = require("./storyHighlight")(sequelize);
-const StoryCollection = require("./storyCollection")(sequelize);
-const StoryChallenge = require("./storyChallenge")(sequelize);
-const StoryMusic = require("./storyMusic")(sequelize);
-const Post = require("./post")(sequelize);
-const PostReaction = require("./postReaction")(sequelize);
-const PostComment = require("./postComment")(sequelize);
-const CommentReaction = require("./commentReaction")(sequelize);
-const RatingTestimonial = require("./ratingTestimonial")(sequelize);
+const AdminUser = require("./warom/adminUser")(sequelize);
+const User = require("./warom/user")(sequelize);
+const Verification = require("./warom/verification")(sequelize);
+const Follow = require("./warom/follow")(sequelize);
+const Block = require("./warom/block")(sequelize);
+const Swipe = require("./warom/swipe")(sequelize);
+const Match = require("./warom/match")(sequelize);
+const ProfileVisit = require("./warom/profileVisit")(sequelize);
+const Conversation = require("./warom/conversation")(sequelize);
+const Message = require("./warom/message")(sequelize);
+const Call = require("./warom/call")(sequelize);
+const CoinPackage = require("./warom/coinPackage")(sequelize);
+const VipPlan = require("./warom/vipPlan")(sequelize);
+const Gift = require("./warom/gift")(sequelize);
+const EarningsConfig = require("./warom/earningsConfig")(sequelize);
+const LedgerAccount = require("./warom/ledgerAccount")(sequelize);
+const LedgerEntry = require("./warom/ledgerEntry")(sequelize);
+const LedgerLine = require("./warom/ledgerLine")(sequelize);
+const Payment = require("./warom/payment")(sequelize);
+const Subscription = require("./warom/subscription")(sequelize);
+const GiftTransaction = require("./warom/giftTransaction")(sequelize);
+const Withdrawal = require("./warom/withdrawal")(sequelize);
+const Notification = require("./warom/notification")(sequelize);
+const Report = require("./warom/report")(sequelize);
+const LiveStream = require("./warom/liveStream")(sequelize);
+const Inquiry = require("./warom/inquiry")(sequelize);
+const Policy = require("./warom/policy")(sequelize);
 
 const models = {
   AdminUser,
-  PublicUser,
-  TokenTransaction,
-  ChatUnlock,
-  PremiumVerification,
-  MarketItem,
-  LookingForPost,
-  Favourite,
+  User,
+  Verification,
+  Follow,
+  Block,
+  Swipe,
+  Match,
+  ProfileVisit,
+  Conversation,
+  Message,
+  Call,
+  CoinPackage,
+  VipPlan,
+  Gift,
+  EarningsConfig,
+  LedgerAccount,
+  LedgerEntry,
+  LedgerLine,
   Payment,
   Subscription,
-  SubscriptionUsage,
+  GiftTransaction,
+  Withdrawal,
   Notification,
-  ProfileView,
   Report,
-  ProfileTag,
-  ProfileBoost,
-  AccountSuspension,
-  SuspensionMessage,
-  Story,
-  StoryView,
-  StoryReaction,
-  StoryComment,
-  StoryHighlight,
-  StoryCollection,
-  StoryChallenge,
-  StoryMusic,
-  Post,
-  PostReaction,
-  PostComment,
-  CommentReaction,
-  RatingTestimonial,
+  LiveStream,
+  Inquiry,
+  Policy,
 };
 
-// Initialize models in correct order (parent tables first)
+const syncOrder = [
+  AdminUser,
+  User,
+  Verification,
+  Follow,
+  Block,
+  Swipe,
+  Match,
+  ProfileVisit,
+  Conversation,
+  Message,
+  Call,
+  CoinPackage,
+  VipPlan,
+  Gift,
+  EarningsConfig,
+  LedgerAccount,
+  LedgerEntry,
+  LedgerLine,
+  Payment,
+  Subscription,
+  GiftTransaction,
+  Withdrawal,
+  Notification,
+  Report,
+  LiveStream,
+  Inquiry,
+  Policy,
+];
+
 const initializeModels = async () => {
-  try {
-    console.log("🔄 Creating/updating tables...");
-
-    // Use alter: false to prevent schema conflicts in production
-    console.log("📋 Syncing parent tables...");
-    await AdminUser.sync({ force: false, alter: false });
-    await PublicUser.sync({ force: false, alter: false });
-
-    console.log("📋 Syncing child tables...");
-    await PremiumVerification.sync({ force: false, alter: false });
-    await MarketItem.sync({ force: false, alter: false });
-    await TokenTransaction.sync({ force: false, alter: false });
-    await ChatUnlock.sync({ force: false, alter: false });
-    await LookingForPost.sync({ force: false, alter: false });
-    await Favourite.sync({ force: false, alter: false });
-    await Payment.sync({ force: false, alter: false });
-    await Subscription.sync({ force: false, alter: false });
-    await SubscriptionUsage.sync({ force: false, alter: false });
-    await Notification.sync({ force: false, alter: false });
-    await ProfileView.sync({ force: false, alter: false });
-    await Report.sync({ force: false, alter: false });
-    await ProfileBoost.sync({ force: false, alter: false });
-    await ProfileTag.sync({ force: false, alter: false });
-    await AccountSuspension.sync({ force: false, alter: false });
-    await SuspensionMessage.sync({ force: false, alter: false });
-    await StoryHighlight.sync({ force: false, alter: false });
-    await StoryCollection.sync({ force: false, alter: false });
-    await StoryChallenge.sync({ force: false, alter: false });
-    await StoryMusic.sync({ force: false, alter: false });
-    await Story.sync({ force: false, alter: false });
-    await StoryView.sync({ force: false, alter: false });
-    await StoryReaction.sync({ force: false, alter: false });
-    await StoryComment.sync({ force: false, alter: false });
-    await Post.sync({ force: false, alter: false });
-    await PostReaction.sync({ force: false, alter: false });
-    await PostComment.sync({ force: false, alter: false });
-    await CommentReaction.sync({ force: false, alter: false });
-    await RatingTestimonial.sync({ force: false, alter: false });
-
-    console.log("✅ All models synced successfully");
-  } catch (error) {
-    console.error("❌ Error syncing models:", error);
-    console.error("❌ Error details:", {
-      name: error.name,
-      message: error.message,
-      parent: error.parent?.message,
-      original: error.original?.message,
-      sql: error.sql,
-    });
-    throw error;
+  console.log("🔄 Syncing WAROM tables...");
+  for (const model of syncOrder) {
+    await model.sync({ force: false, alter: false });
   }
+  console.log("✅ WAROM models synced");
 };
 
 const setupAssociations = () => {
-  try {
-    // PublicUser ↔ TokenTransaction
-    models.PublicUser.hasMany(models.TokenTransaction, {
-      foreignKey: "public_user_id",
-      as: "tokenTransactions",
-    });
-    models.TokenTransaction.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "user",
-    });
+  // Identity
+  User.hasMany(Verification, { foreignKey: "user_id", as: "verifications" });
+  Verification.belongsTo(User, { foreignKey: "user_id", as: "user" });
+  Verification.belongsTo(AdminUser, { foreignKey: "reviewed_by", as: "reviewer" });
 
-    // PublicUser ↔ ChatUnlock (initiated)
-    models.PublicUser.hasMany(models.ChatUnlock, {
-      foreignKey: "public_user_id",
-      as: "initiatedChats",
-    });
-    models.ChatUnlock.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "initiator",
-    });
-    // PublicUser ↔ ChatUnlock (target)
-    models.ChatUnlock.belongsTo(models.PublicUser, {
-      foreignKey: "target_user_id",
-      as: "target",
-    });
+  // Social graph
+  User.hasMany(Follow, { foreignKey: "follower_id", as: "following" });
+  User.hasMany(Follow, { foreignKey: "following_id", as: "followers" });
+  Follow.belongsTo(User, { foreignKey: "follower_id", as: "follower" });
+  Follow.belongsTo(User, { foreignKey: "following_id", as: "followed" });
 
-    // PublicUser ↔ PremiumVerification
-    models.PublicUser.hasOne(models.PremiumVerification, {
-      foreignKey: "public_user_id",
-      as: "premiumVerification",
-    });
-    models.PremiumVerification.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "publicUser",
-    });
-    models.PremiumVerification.belongsTo(models.AdminUser, {
-      foreignKey: "admin_id",
-      as: "admin",
-    });
-    models.AdminUser.hasMany(models.PremiumVerification, {
-      foreignKey: "admin_id",
-      as: "handledVerifications",
-    });
+  User.hasMany(Block, { foreignKey: "blocker_id", as: "blocksIssued" });
+  User.hasMany(Block, { foreignKey: "blocked_id", as: "blocksReceived" });
+  Block.belongsTo(User, { foreignKey: "blocker_id", as: "blocker" });
+  Block.belongsTo(User, { foreignKey: "blocked_id", as: "blocked" });
 
-    // AdminUser ↔ MarketItem
-    models.AdminUser.hasMany(models.MarketItem, {
-      foreignKey: "created_by",
-      as: "marketItems",
-    });
-    models.MarketItem.belongsTo(models.AdminUser, {
-      foreignKey: "created_by",
-      as: "creator",
-    });
+  User.hasMany(Swipe, { foreignKey: "swiper_id", as: "swipesGiven" });
+  User.hasMany(Swipe, { foreignKey: "target_id", as: "swipesReceived" });
+  Swipe.belongsTo(User, { foreignKey: "swiper_id", as: "swiper" });
+  Swipe.belongsTo(User, { foreignKey: "target_id", as: "target" });
 
-    // PublicUser ↔ LookingForPost
-    models.PublicUser.hasMany(models.LookingForPost, {
-      foreignKey: "public_user_id",
-      as: "lookingForPosts",
-    });
-    models.LookingForPost.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "author",
-    });
+  User.hasMany(Match, { foreignKey: "user_a_id", as: "matchesAsA" });
+  User.hasMany(Match, { foreignKey: "user_b_id", as: "matchesAsB" });
+  Match.belongsTo(User, { foreignKey: "user_a_id", as: "userA" });
+  Match.belongsTo(User, { foreignKey: "user_b_id", as: "userB" });
 
-    // PublicUser ↔ Favourite
-    models.PublicUser.hasMany(models.Favourite, {
-      foreignKey: "public_user_id",
-      as: "favourites",
-    });
-    models.Favourite.belongsTo(models.PublicUser, {
-      foreignKey: "favourite_user_id",
-      as: "favouritedUser",
-    });
-    // Also link favourite record back to owner
-    models.Favourite.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "owner",
-    });
+  User.hasMany(ProfileVisit, { foreignKey: "visitor_id", as: "visitsGiven" });
+  User.hasMany(ProfileVisit, { foreignKey: "visited_id", as: "visitsReceived" });
+  ProfileVisit.belongsTo(User, { foreignKey: "visitor_id", as: "visitor" });
+  ProfileVisit.belongsTo(User, { foreignKey: "visited_id", as: "visited" });
 
-    // PublicUser ↔ Payment
-    models.PublicUser.hasMany(models.Payment, {
-      foreignKey: "public_user_id",
-      as: "payments",
-    });
-    models.Payment.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "payer",
-    });
+  // Communication
+  User.hasMany(Conversation, { foreignKey: "participant_a_id", as: "conversationsAsA" });
+  User.hasMany(Conversation, { foreignKey: "participant_b_id", as: "conversationsAsB" });
+  Conversation.belongsTo(User, { foreignKey: "participant_a_id", as: "participantA" });
+  Conversation.belongsTo(User, { foreignKey: "participant_b_id", as: "participantB" });
+  Conversation.hasMany(Message, { foreignKey: "conversation_id", as: "messages" });
+  Message.belongsTo(Conversation, { foreignKey: "conversation_id", as: "conversation" });
+  Message.belongsTo(User, { foreignKey: "sender_id", as: "sender" });
+  Message.belongsTo(Gift, { foreignKey: "gift_id", as: "gift" });
 
-    // PublicUser ↔ Subscription
-    models.PublicUser.hasMany(models.Subscription, {
-      foreignKey: "public_user_id",
-      as: "subscriptions",
-    });
-    models.Subscription.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "subscriber",
-    });
+  User.hasMany(Call, { foreignKey: "caller_id", as: "callsMade" });
+  User.hasMany(Call, { foreignKey: "callee_id", as: "callsReceived" });
+  Call.belongsTo(User, { foreignKey: "caller_id", as: "caller" });
+  Call.belongsTo(User, { foreignKey: "callee_id", as: "callee" });
 
-    // PublicUser ↔ SubscriptionUsage
-    models.PublicUser.hasMany(models.SubscriptionUsage, {
-      foreignKey: "public_user_id",
-      as: "subscriptionUsages",
-    });
-    models.SubscriptionUsage.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "usageOwner",
-    });
+  // Catalogue / money
+  User.hasMany(LedgerAccount, { foreignKey: "owner_id", as: "ledgerAccounts" });
+  LedgerAccount.belongsTo(User, { foreignKey: "owner_id", as: "owner" });
+  LedgerEntry.hasMany(LedgerLine, { foreignKey: "entry_id", as: "lines" });
+  LedgerLine.belongsTo(LedgerEntry, { foreignKey: "entry_id", as: "entry" });
+  LedgerLine.belongsTo(LedgerAccount, { foreignKey: "account_id", as: "account" });
+  LedgerEntry.belongsTo(User, { foreignKey: "actor_user_id", as: "actor" });
 
-    // PublicUser ↔ Notification
-    models.PublicUser.hasMany(models.Notification, {
-      foreignKey: "public_user_id",
-      as: "notifications",
-    });
-    models.Notification.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "recipient",
-    });
+  User.hasMany(Payment, { foreignKey: "user_id", as: "payments" });
+  Payment.belongsTo(User, { foreignKey: "user_id", as: "payer" });
+  Payment.belongsTo(CoinPackage, { foreignKey: "package_id", as: "coinPackage" });
+  Payment.belongsTo(VipPlan, { foreignKey: "vip_plan_id", as: "vipPlan" });
 
-    // PublicUser ↔ ProfileView (viewer)
-    models.PublicUser.hasMany(models.ProfileView, {
-      foreignKey: "viewer_id",
-      as: "viewsGiven",
-    });
-    models.ProfileView.belongsTo(models.PublicUser, {
-      foreignKey: "viewer_id",
-      as: "viewer",
-    });
+  User.hasMany(Subscription, { foreignKey: "user_id", as: "subscriptions" });
+  Subscription.belongsTo(User, { foreignKey: "user_id", as: "subscriber" });
+  Subscription.belongsTo(VipPlan, { foreignKey: "vip_plan_id", as: "plan" });
+  Subscription.belongsTo(Payment, { foreignKey: "payment_id", as: "payment" });
 
-    // PublicUser ↔ ProfileView (viewed)
-    models.PublicUser.hasMany(models.ProfileView, {
-      foreignKey: "viewed_id",
-      as: "viewsReceived",
-    });
-    models.ProfileView.belongsTo(models.PublicUser, {
-      foreignKey: "viewed_id",
-      as: "viewedUser",
-    });
+  Gift.hasMany(GiftTransaction, { foreignKey: "gift_id", as: "transactions" });
+  GiftTransaction.belongsTo(Gift, { foreignKey: "gift_id", as: "gift" });
+  GiftTransaction.belongsTo(User, { foreignKey: "sender_id", as: "sender" });
+  GiftTransaction.belongsTo(User, { foreignKey: "receiver_id", as: "receiver" });
 
-    // PublicUser ↔ Report (reporter)
-    models.PublicUser.hasMany(models.Report, {
-      foreignKey: "public_user_id",
-      as: "reports",
-    });
-    models.Report.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "reporter",
-    });
+  User.hasMany(Withdrawal, { foreignKey: "chatter_id", as: "withdrawals" });
+  Withdrawal.belongsTo(User, { foreignKey: "chatter_id", as: "chatter" });
+  Withdrawal.belongsTo(AdminUser, { foreignKey: "reviewed_by", as: "reviewer" });
 
-    // PublicUser ↔ Report (reported user)
-    models.PublicUser.hasMany(models.Report, {
-      foreignKey: "reported_user_id",
-      as: "reportsAgainst",
-    });
-    models.Report.belongsTo(models.PublicUser, {
-      foreignKey: "reported_user_id",
-      as: "reportedUser",
-    });
+  EarningsConfig.belongsTo(AdminUser, { foreignKey: "updated_by", as: "updatedByAdmin" });
 
-    // AdminUser ↔ Report
-    models.AdminUser.hasMany(models.Report, {
-      foreignKey: "admin_id",
-      as: "handledReports",
-    });
-    models.Report.belongsTo(models.AdminUser, {
-      foreignKey: "admin_id",
-      as: "handledBy",
-    });
+  // Trust / ops
+  User.hasMany(Notification, { foreignKey: "user_id", as: "notifications" });
+  Notification.belongsTo(User, { foreignKey: "user_id", as: "recipient" });
 
-    // PublicUser ↔ ProfileBoost
-    models.PublicUser.hasMany(models.ProfileBoost, {
-      foreignKey: "public_user_id",
-      as: "profileBoosts",
-    });
-    models.ProfileBoost.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "owner",
-    });
+  User.hasMany(Report, { foreignKey: "reporter_id", as: "reportsFiled" });
+  User.hasMany(Report, { foreignKey: "reported_user_id", as: "reportsAgainst" });
+  Report.belongsTo(User, { foreignKey: "reporter_id", as: "reporter" });
+  Report.belongsTo(User, { foreignKey: "reported_user_id", as: "reportedUser" });
+  Report.belongsTo(AdminUser, { foreignKey: "handled_by", as: "handler" });
 
-    // PublicUser ↔ ProfileTag (creator)
-    models.PublicUser.hasMany(models.ProfileTag, {
-      foreignKey: "public_user_id",
-      as: "createdProfileTags",
-    });
-    models.ProfileTag.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "tagger",
-    });
+  User.hasMany(LiveStream, { foreignKey: "host_id", as: "liveStreams" });
+  LiveStream.belongsTo(User, { foreignKey: "host_id", as: "host" });
 
-    // PublicUser ↔ ProfileTag (tagged user)
-    models.PublicUser.hasMany(models.ProfileTag, {
-      foreignKey: "tagged_user_id",
-      as: "receivedProfileTags",
-    });
-    models.ProfileTag.belongsTo(models.PublicUser, {
-      foreignKey: "tagged_user_id",
-      as: "taggedUser",
-    });
+  Inquiry.belongsTo(AdminUser, { foreignKey: "handled_by", as: "handler" });
+  Policy.belongsTo(AdminUser, { foreignKey: "updated_by", as: "updatedByAdmin" });
 
-    // AccountSuspension associations
-    models.AccountSuspension.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "publicUser",
-    });
-    models.PublicUser.hasMany(models.AccountSuspension, {
-      foreignKey: "public_user_id",
-      as: "suspensions",
-    });
-    models.AccountSuspension.belongsTo(models.AdminUser, {
-      foreignKey: "admin_user_id",
-      as: "admin",
-    });
-    models.AdminUser.hasMany(models.AccountSuspension, {
-      foreignKey: "admin_user_id",
-      as: "issuedSuspensions",
-    });
-
-    // SuspensionMessage associations
-    models.AccountSuspension.hasMany(models.SuspensionMessage, {
-      foreignKey: "suspension_id",
-      as: "messages",
-      onDelete: "CASCADE",
-    });
-    models.SuspensionMessage.belongsTo(models.AccountSuspension, {
-      foreignKey: "suspension_id",
-      as: "suspension",
-    });
-
-    // Story associations
-    models.PublicUser.hasMany(models.Story, {
-      foreignKey: "public_user_id",
-      as: "stories",
-    });
-    models.Story.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "user",
-    });
-
-    // StoryView associations
-    models.Story.hasMany(models.StoryView, {
-      foreignKey: "story_id",
-      as: "views",
-      onDelete: "CASCADE",
-    });
-    models.StoryView.belongsTo(models.Story, {
-      foreignKey: "story_id",
-      as: "story",
-    });
-    models.StoryView.belongsTo(models.PublicUser, {
-      foreignKey: "viewer_id",
-      as: "viewer",
-    });
-    models.PublicUser.hasMany(models.StoryView, {
-      foreignKey: "viewer_id",
-      as: "storyViews",
-    });
-
-    // StoryReaction associations
-    models.Story.hasMany(models.StoryReaction, {
-      foreignKey: "story_id",
-      as: "reactions",
-      onDelete: "CASCADE",
-    });
-    models.StoryReaction.belongsTo(models.Story, {
-      foreignKey: "story_id",
-      as: "story",
-    });
-    models.StoryReaction.belongsTo(models.PublicUser, {
-      foreignKey: "user_id",
-      as: "user",
-    });
-    models.PublicUser.hasMany(models.StoryReaction, {
-      foreignKey: "user_id",
-      as: "storyReactions",
-    });
-
-    // StoryComment associations
-    models.Story.hasMany(models.StoryComment, {
-      foreignKey: "story_id",
-      as: "comments",
-      onDelete: "CASCADE",
-    });
-    models.StoryComment.belongsTo(models.Story, {
-      foreignKey: "story_id",
-      as: "story",
-    });
-    models.StoryComment.belongsTo(models.PublicUser, {
-      foreignKey: "user_id",
-      as: "user",
-    });
-    models.PublicUser.hasMany(models.StoryComment, {
-      foreignKey: "user_id",
-      as: "storyComments",
-    });
-    models.StoryComment.hasMany(models.StoryComment, {
-      foreignKey: "parent_comment_id",
-      as: "replies",
-    });
-    models.StoryComment.belongsTo(models.StoryComment, {
-      foreignKey: "parent_comment_id",
-      as: "parentComment",
-    });
-
-    // StoryHighlight associations
-    models.PublicUser.hasMany(models.StoryHighlight, {
-      foreignKey: "public_user_id",
-      as: "storyHighlights",
-    });
-    models.StoryHighlight.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "user",
-    });
-    models.StoryHighlight.hasMany(models.Story, {
-      foreignKey: "highlight_id",
-      as: "stories",
-    });
-    models.Story.belongsTo(models.StoryHighlight, {
-      foreignKey: "highlight_id",
-      as: "highlight",
-    });
-
-    // StoryCollection associations
-    models.StoryCollection.belongsTo(models.PublicUser, {
-      foreignKey: "created_by",
-      as: "creator",
-    });
-    models.PublicUser.hasMany(models.StoryCollection, {
-      foreignKey: "created_by",
-      as: "createdCollections",
-    });
-    models.StoryCollection.hasMany(models.Story, {
-      foreignKey: "collection_id",
-      as: "stories",
-    });
-    models.Story.belongsTo(models.StoryCollection, {
-      foreignKey: "collection_id",
-      as: "collection",
-    });
-
-    // StoryChallenge associations
-    models.StoryChallenge.belongsTo(models.PublicUser, {
-      foreignKey: "created_by",
-      as: "creator",
-    });
-    models.PublicUser.hasMany(models.StoryChallenge, {
-      foreignKey: "created_by",
-      as: "createdChallenges",
-    });
-    models.StoryChallenge.hasMany(models.Story, {
-      foreignKey: "challenge_id",
-      as: "stories",
-    });
-    models.Story.belongsTo(models.StoryChallenge, {
-      foreignKey: "challenge_id",
-      as: "challenge",
-    });
-
-    // StoryMusic associations
-    models.StoryMusic.hasMany(models.Story, {
-      foreignKey: "music_id",
-      as: "stories",
-    });
-    models.Story.belongsTo(models.StoryMusic, {
-      foreignKey: "music_id",
-      as: "music",
-    });
-
-    // Post associations
-    models.PublicUser.hasMany(models.Post, {
-      foreignKey: "public_user_id",
-      as: "posts",
-    });
-    models.Post.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "user",
-    });
-
-    // PostReaction associations
-    models.Post.hasMany(models.PostReaction, {
-      foreignKey: "post_id",
-      as: "reactions",
-      onDelete: "CASCADE",
-    });
-    models.PostReaction.belongsTo(models.Post, {
-      foreignKey: "post_id",
-      as: "post",
-    });
-    models.PostReaction.belongsTo(models.PublicUser, {
-      foreignKey: "user_id",
-      as: "user",
-    });
-    models.PublicUser.hasMany(models.PostReaction, {
-      foreignKey: "user_id",
-      as: "postReactions",
-    });
-
-    // PostComment associations
-    models.Post.hasMany(models.PostComment, {
-      foreignKey: "post_id",
-      as: "comments",
-      onDelete: "CASCADE",
-    });
-    models.PostComment.belongsTo(models.Post, {
-      foreignKey: "post_id",
-      as: "post",
-    });
-    models.PostComment.belongsTo(models.PublicUser, {
-      foreignKey: "user_id",
-      as: "user",
-    });
-    models.PublicUser.hasMany(models.PostComment, {
-      foreignKey: "user_id",
-      as: "postComments",
-    });
-    models.PostComment.hasMany(models.PostComment, {
-      foreignKey: "parent_comment_id",
-      as: "replies",
-    });
-    models.PostComment.belongsTo(models.PostComment, {
-      foreignKey: "parent_comment_id",
-      as: "parentComment",
-    });
-
-    // CommentReaction associations
-    models.PostComment.hasMany(models.CommentReaction, {
-      foreignKey: "comment_id",
-      as: "reactions",
-      onDelete: "CASCADE",
-    });
-    models.CommentReaction.belongsTo(models.PostComment, {
-      foreignKey: "comment_id",
-      as: "comment",
-    });
-    models.CommentReaction.belongsTo(models.PublicUser, {
-      foreignKey: "user_id",
-      as: "user",
-    });
-    models.PublicUser.hasMany(models.CommentReaction, {
-      foreignKey: "user_id",
-      as: "commentReactions",
-    });
-
-    // PublicUser ↔ RatingTestimonial
-    models.PublicUser.hasOne(models.RatingTestimonial, {
-      foreignKey: "public_user_id",
-      as: "ratingTestimonial",
-    });
-    models.RatingTestimonial.belongsTo(models.PublicUser, {
-      foreignKey: "public_user_id",
-      as: "user",
-    });
-
-    console.log("✅ All associations set up successfully");
-  } catch (error) {
-    console.error("❌ Error during setupAssociations:", error);
-  }
+  console.log("✅ WAROM associations configured");
 };
 
-module.exports = { ...models, initializeModels, setupAssociations, sequelize };
+module.exports = {
+  ...models,
+  initializeModels,
+  setupAssociations,
+  sequelize,
+};

@@ -1,11 +1,10 @@
 {
-  "name": "gms_api",
-  "version": "1.0.0",
-  "description": "Duncan Muteti - mutetidanz@gmail.com",
+  "name": "warom-api",
+  "version": "2.0.0",
+  "description": "WAROM API — users, chatters, admin, public site",
   "main": "src/server.js",
   "scripts": {
     "start": "nodemon src/server.js",
-    "start:cluster": "node src/cluster.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "author": "Duncan Muteti",
