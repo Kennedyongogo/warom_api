@@ -8,9 +8,18 @@ router.post("/bootstrap", adminController.bootstrap);
 router.post("/login", adminController.login);
 
 router.use(authenticateAdmin);
+router.get("/me", adminController.me);
+router.patch("/me", adminController.updateProfile);
+router.patch("/me/password", adminController.updatePassword);
 router.get("/dashboard", adminController.dashboard);
 
+router.get("/directory-stats", adminController.directoryStats);
 router.get("/users", adminController.listUsers);
+router.get("/users/:id", adminController.getUser);
+router.get("/admins", adminController.listAdmins);
+router.post("/admins", adminController.createAdmin);
+router.get("/admins/:id", adminController.getAdmin);
+router.patch("/admins/:id", adminController.updateAdmin);
 router.post("/users/:id/terminate", adminController.terminateUser);
 
 router.get("/coin-packages", adminController.listCoinPackages);
@@ -38,7 +47,9 @@ router.patch("/reports/:id", adminController.resolveReport);
 router.get("/live-streams", adminController.listLiveStreams);
 router.post("/notifications/broadcast", adminController.broadcastNotification);
 
+router.get("/inquiry-stats", adminController.inquiryStats);
 router.get("/inquiries", adminController.listInquiries);
+router.get("/inquiries/:id", adminController.getInquiry);
 router.patch("/inquiries/:id", adminController.updateInquiry);
 
 router.get("/policies", adminController.listPolicies);
