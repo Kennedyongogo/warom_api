@@ -1,4 +1,6 @@
-FROM node:lts-slim
+# Pin Node 20 — node:lts (24+) breaks jsonwebtoken/jwa (buffer-equal-constant-time).
+# Same pattern as kendu-api.
+FROM node:20-slim
 
 WORKDIR /usr/src/app
 
@@ -55,6 +57,6 @@ COPY . ./
 
 EXPOSE 4000
 
-# Single process: Socket.IO + Sequelize sync are unsafe with PM2 cluster (-i max).
-# Cluster mode was causing unstable API workers and nginx 502s on /api/admin/login.
-CMD ["pm2-runtime", "start", "src/server.js", "--name", "warom-api"]
+# Cap workers — "-i max" on a busy VPS multiplies RAM use and crash loops.
+# Same as kendu-api.
+CMD ["pm2-runtime", "src/server.js", "-i", "2"]

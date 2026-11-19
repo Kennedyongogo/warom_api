@@ -121,20 +121,17 @@ app.use((req, res, next) => {
 
 app.use(errorHandler);
 
-const initializeApp = async () => {
+// Same boot shape as kendu-api: models + associations first; seed is best-effort.
+const appInitialized = (async () => {
   console.log("🚀 Initializing WAROM application...");
   await initializeModels();
   setupAssociations();
   try {
     await seedDefaults();
   } catch (err) {
-    // Do not block auth/admin login if catalogue seeding fails.
     console.error("⚠️ seedDefaults failed:", err.message);
   }
   console.log("✅ WAROM application initialized");
-  return true;
-};
-
-const appInitialized = initializeApp();
+})();
 
 module.exports = { app, appInitialized };
