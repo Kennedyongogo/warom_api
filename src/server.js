@@ -28,13 +28,24 @@ async function createServer() {
     await appInitialized;
 
     const server = http.createServer(app);
-    attachRealtime(server);
-    startEarningsReleaseJob();
 
-    server.listen(PORT, () => {
+    // Keep HTTP/admin login up even if realtime/cron fail in production.
+    try {
+      attachRealtime(server);
+    } catch (err) {
+      console.error("⚠️ Socket.IO attach failed:", err.message);
+    }
+    try {
+      startEarningsReleaseJob();
+    } catch (err) {
+      console.error("⚠️ Earnings release job failed to start:", err.message);
+    }
+
+    // Bind all interfaces so Docker/nginx can reach the API.
+    server.listen(PORT, "0.0.0.0", () => {
       isStarting = false;
       serverInstance = server;
-      console.log(`🚀 Server listening on port ${PORT} (PID: ${process.pid})`);
+      console.log(`🚀 Server listening on 0.0.0.0:${PORT} (PID: ${process.pid})`);
       console.log(`📊 Environment: ${process.env.NODE_ENV}`);
       console.log(
         `🗄️  Database: ${config.database.direct.database}@${config.database.direct.host}:${config.database.direct.port}`

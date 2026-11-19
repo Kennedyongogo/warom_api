@@ -125,7 +125,12 @@ const initializeApp = async () => {
   console.log("🚀 Initializing WAROM application...");
   await initializeModels();
   setupAssociations();
-  await seedDefaults();
+  try {
+    await seedDefaults();
+  } catch (err) {
+    // Do not block auth/admin login if catalogue seeding fails.
+    console.error("⚠️ seedDefaults failed:", err.message);
+  }
   console.log("✅ WAROM application initialized");
   return true;
 };

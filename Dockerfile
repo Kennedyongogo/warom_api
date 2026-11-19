@@ -55,5 +55,6 @@ COPY . ./
 
 EXPOSE 4000
 
-# Use PM2 to run the app in production mode
-CMD ["pm2-runtime", "src/server.js", "-i", "max"]
+# Single process: Socket.IO + Sequelize sync are unsafe with PM2 cluster (-i max).
+# Cluster mode was causing unstable API workers and nginx 502s on /api/admin/login.
+CMD ["pm2-runtime", "start", "src/server.js", "--name", "warom-api"]
