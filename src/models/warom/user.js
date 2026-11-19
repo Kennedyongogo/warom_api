@@ -10,7 +10,19 @@ module.exports = (sequelize) =>
         allowNull: false,
         defaultValue: "user",
       },
-      email: { type: DataTypes.STRING, allowNull: true, unique: true, validate: { isEmail: true } },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+        validate: {
+          // Sequelize runs validators even when allowNull — skip blanks.
+          isEmailOrEmpty(value) {
+            if (value == null || String(value).trim() === "") return;
+            const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
+            if (!ok) throw new Error("Must be a valid email");
+          },
+        },
+      },
       phone: { type: DataTypes.STRING, allowNull: true },
       password: { type: DataTypes.STRING, allowNull: true },
       auth_provider: {

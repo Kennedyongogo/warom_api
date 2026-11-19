@@ -9,6 +9,20 @@ const sanitize = (user) => {
   return json;
 };
 
+const mapCreateError = (err) => {
+  if (err.name === "SequelizeUniqueConstraintError") {
+    const field = err.errors?.[0]?.path;
+    if (field === "email") return new Error("Email already registered");
+    if (field === "username") return new Error("Username already taken");
+    return new Error("Account already exists");
+  }
+  if (err.name === "SequelizeValidationError") {
+    const detail = err.errors?.map((e) => e.message).filter(Boolean).join("; ");
+    return new Error(detail || "Validation failed");
+  }
+  return err;
+};
+
 const register = async (payload) => {
   const {
     account_type = "user",
@@ -18,27 +32,48 @@ const register = async (payload) => {
     auth_provider = "email",
     google_id,
     apple_id,
-    ...profile
+    date_of_birth,
+    gender,
+    country,
+    city,
+    bio,
+    hobbies,
   } = payload;
 
-  if (!username) throw new Error("Username is required");
-  if (auth_provider === "email" && (!email || !password)) {
+  const cleanUsername = String(username || "").trim();
+  const cleanEmail =
+    email == null || String(email).trim() === ""
+      ? null
+      : String(email).trim().toLowerCase();
+
+  if (!cleanUsername) throw new Error("Username is required");
+  if (auth_provider === "email" && (!cleanEmail || !password)) {
     throw new Error("Email and password are required");
   }
 
   const hashed =
     auth_provider === "email" ? await bcrypt.hash(password, 10) : null;
 
-  const user = await User.create({
-    account_type,
-    email,
-    password: hashed,
-    username,
-    auth_provider,
-    google_id: google_id || null,
-    apple_id: apple_id || null,
-    ...profile,
-  });
+  let user;
+  try {
+    user = await User.create({
+      account_type,
+      email: cleanEmail,
+      password: hashed,
+      username: cleanUsername,
+      auth_provider,
+      ...(google_id ? { google_id } : {}),
+      ...(apple_id ? { apple_id } : {}),
+      ...(date_of_birth ? { date_of_birth } : {}),
+      ...(gender ? { gender } : {}),
+      ...(country ? { country } : {}),
+      ...(city ? { city } : {}),
+      ...(bio ? { bio } : {}),
+      ...(Array.isArray(hobbies) ? { hobbies } : {}),
+    });
+  } catch (err) {
+    throw mapCreateError(err);
+  }
 
   await ledgerService.ensureUserAccounts(user);
   const token = signUserToken(user);
