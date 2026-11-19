@@ -9,6 +9,7 @@ router.post("/follow/:userId", socialController.follow);
 router.delete("/follow/:userId", socialController.unfollow);
 router.post("/block/:userId", socialController.block);
 router.delete("/block/:userId", socialController.unblock);
+router.get("/blocks", socialController.listBlocks);
 router.post("/swipe", socialController.swipe);
 router.get("/matches", socialController.listMatches);
 

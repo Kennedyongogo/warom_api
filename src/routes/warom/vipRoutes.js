@@ -5,6 +5,7 @@ const vipController = require("../../controllers/warom/vipController");
 const { authenticateUser } = require("../../middleware/warom/auth");
 
 router.get("/plans", vipController.plans);
+router.get("/me", authenticateUser, vipController.me);
 router.post("/subscribe", authenticateUser, vipController.subscribeWithCoins);
 
 module.exports = router;

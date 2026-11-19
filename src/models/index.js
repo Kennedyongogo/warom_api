@@ -27,6 +27,9 @@ const Report = require("./warom/report")(sequelize);
 const LiveStream = require("./warom/liveStream")(sequelize);
 const Inquiry = require("./warom/inquiry")(sequelize);
 const Policy = require("./warom/policy")(sequelize);
+const LockedPhoto = require("./warom/lockedPhoto")(sequelize);
+const PhotoUnlock = require("./warom/photoUnlock")(sequelize);
+const EarningHold = require("./warom/earningHold")(sequelize);
 
 const models = {
   AdminUser,
@@ -56,6 +59,9 @@ const models = {
   LiveStream,
   Inquiry,
   Policy,
+  LockedPhoto,
+  PhotoUnlock,
+  EarningHold,
 };
 
 const syncOrder = [
@@ -86,6 +92,9 @@ const syncOrder = [
   LiveStream,
   Inquiry,
   Policy,
+  LockedPhoto,
+  PhotoUnlock,
+  EarningHold,
 ];
 
 const initializeModels = async () => {
@@ -187,6 +196,16 @@ const setupAssociations = () => {
 
   Inquiry.belongsTo(AdminUser, { foreignKey: "handled_by", as: "handler" });
   Policy.belongsTo(AdminUser, { foreignKey: "updated_by", as: "updatedByAdmin" });
+
+  // Locked photos / unlocks / earning holds
+  User.hasMany(LockedPhoto, { foreignKey: "owner_id", as: "lockedPhotos" });
+  LockedPhoto.belongsTo(User, { foreignKey: "owner_id", as: "owner" });
+  LockedPhoto.hasMany(PhotoUnlock, { foreignKey: "photo_id", as: "unlocks" });
+  PhotoUnlock.belongsTo(LockedPhoto, { foreignKey: "photo_id", as: "photo" });
+  PhotoUnlock.belongsTo(User, { foreignKey: "buyer_id", as: "buyer" });
+  PhotoUnlock.belongsTo(User, { foreignKey: "owner_id", as: "owner" });
+  User.hasMany(EarningHold, { foreignKey: "chatter_id", as: "earningHolds" });
+  EarningHold.belongsTo(User, { foreignKey: "chatter_id", as: "chatter" });
 
   console.log("✅ WAROM associations configured");
 };

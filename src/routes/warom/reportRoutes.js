@@ -5,5 +5,6 @@ const reportController = require("../../controllers/warom/reportController");
 const { authenticateUser } = require("../../middleware/warom/auth");
 
 router.post("/", authenticateUser, reportController.create);
+router.get("/mine", authenticateUser, reportController.mine);
 
 module.exports = router;

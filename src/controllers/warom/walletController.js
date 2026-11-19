@@ -13,13 +13,32 @@ exports.summary = asyncHandler(async (req, res) => {
   return ok(res, data);
 });
 
+const STICKERS = [
+  { id: "heart", label: "Heart", media_url: "/uploads/gifts/sticker-heart.svg", coin_cost: 0 },
+  { id: "fire", label: "Fire", media_url: "/uploads/gifts/sticker-fire.svg", coin_cost: 0 },
+  { id: "wave", label: "Wave", media_url: "/uploads/gifts/sticker-wave.svg", coin_cost: 0 },
+  { id: "kiss", label: "Kiss", media_url: "/uploads/gifts/sticker-kiss.svg", coin_cost: 0 },
+  { id: "laugh", label: "Laugh", media_url: "/uploads/gifts/sticker-laugh.svg", coin_cost: 0 },
+];
+
+const GIFS = [
+  { id: "cheer", label: "Cheer", media_url: "https://media.giphy.com/media/artGifsPlaceholder/cheer.gif" },
+  { id: "dance", label: "Dance", media_url: "https://media.giphy.com/media/artGifsPlaceholder/dance.gif" },
+];
+
 exports.catalogue = asyncHandler(async (_req, res) => {
   const [coinPackages, gifts, vipPlans] = await Promise.all([
     CoinPackage.findAll({ where: { is_active: true }, order: [["sort_order", "ASC"]] }),
     Gift.findAll({ where: { is_active: true }, order: [["sort_order", "ASC"]] }),
     VipPlan.findAll({ where: { is_active: true }, order: [["sort_order", "ASC"]] }),
   ]);
-  return ok(res, { coinPackages, gifts, vipPlans });
+  return ok(res, {
+    coinPackages,
+    gifts,
+    vipPlans,
+    stickers: STICKERS,
+    gifs: GIFS,
+  });
 });
 
 exports.createCoinPurchase = asyncHandler(async (req, res) => {

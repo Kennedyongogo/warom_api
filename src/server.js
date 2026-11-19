@@ -2,15 +2,15 @@ const http = require("http");
 const { app, appInitialized } = require("./app");
 const config = require("./config/config");
 const { testConnections } = require("./config/database");
+const { attachRealtime } = require("./realtime/socket");
+const { startEarningsReleaseJob } = require("./jobs/earningsReleaseJob");
 
 const PORT = process.env.PORT || 4000;
 
-// Prevent multiple server instances
 let serverInstance = null;
 let isStarting = false;
 
 async function createServer() {
-  // Prevent multiple instances
   if (isStarting) {
     console.log("⚠️ Server is already starting, skipping...");
     return null;
@@ -24,13 +24,12 @@ async function createServer() {
   isStarting = true;
 
   try {
-    // Test database connections
     await testConnections();
-
-    // Wait for app initialization to complete
     await appInitialized;
 
     const server = http.createServer(app);
+    attachRealtime(server);
+    startEarningsReleaseJob();
 
     server.listen(PORT, () => {
       isStarting = false;
@@ -41,9 +40,9 @@ async function createServer() {
         `🗄️  Database: ${config.database.direct.database}@${config.database.direct.host}:${config.database.direct.port}`
       );
       console.log(`🌐 API Base URL: http://localhost:${PORT}/api`);
+      console.log(`🔌 Socket.IO: http://localhost:${PORT}/socket.io`);
     });
 
-    // Handle port already in use
     server.on("error", (err) => {
       if (err.code === "EADDRINUSE") {
         console.error(`❌ Port ${PORT} is already in use`);
@@ -56,7 +55,6 @@ async function createServer() {
       }
     });
 
-    // Graceful shutdown for individual workers
     const gracefulShutdown = (signal) => {
       console.log(`🔄 Received ${signal}, shutting down gracefully...`);
       if (serverInstance) {
@@ -67,7 +65,6 @@ async function createServer() {
           process.exit(0);
         });
 
-        // Force close after 10 seconds
         setTimeout(() => {
           console.error("⚠️ Forcing shutdown after timeout");
           process.exit(1);
@@ -89,10 +86,8 @@ async function createServer() {
   }
 }
 
-// Export for cluster mode
 module.exports = { createServer };
 
-// If running directly (not in cluster), start the server
 if (require.main === module) {
   createServer();
 }

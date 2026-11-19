@@ -7,6 +7,7 @@ const {
   GiftTransaction,
   EarningsConfig,
   Withdrawal,
+  EarningHold,
 } = require("../../models");
 const ledgerService = require("./ledgerService");
 
@@ -126,6 +127,26 @@ const sendGift = async ({ sender, receiverId, giftId, conversationId = null }) =
     });
 
     await giftTx.update({ ledger_entry_id: entry.id }, { transaction });
+
+    if (receiver.account_type === "chatter" && chatterShare > 0) {
+      const holdDays = Number(config.pending_hold_days || 7);
+      const availableAt = new Date(
+        Date.now() + holdDays * 24 * 60 * 60 * 1000
+      );
+      await EarningHold.create(
+        {
+          chatter_id: receiver.id,
+          source_type: "gift",
+          source_id: giftTx.id,
+          amount_coins: chatterShare,
+          ledger_entry_id: entry.id,
+          available_at: availableAt,
+          status: "pending",
+        },
+        { transaction }
+      );
+    }
+
     return giftTx;
   });
 };

@@ -10,6 +10,42 @@ exports.plans = asyncHandler(async (_req, res) => {
   return ok(res, plans);
 });
 
+exports.me = asyncHandler(async (req, res) => {
+  const active = await Subscription.findOne({
+    where: {
+      user_id: req.userId,
+      status: "active",
+    },
+    include: [{ model: VipPlan, as: "plan", required: false }],
+    order: [["expires_at", "DESC"]],
+  });
+
+  const expiresAt = req.user.vip_expires_at
+    ? new Date(req.user.vip_expires_at)
+    : null;
+  const isVip =
+    Boolean(req.user.is_vip) && (!expiresAt || expiresAt.getTime() > Date.now());
+
+  if (req.user.is_vip && expiresAt && expiresAt.getTime() <= Date.now()) {
+    await req.user.update({ is_vip: false });
+  }
+
+  return ok(res, {
+    is_vip: isVip,
+    vip_expires_at: req.user.vip_expires_at,
+    subscription: active,
+    perks: isVip
+      ? {
+          higher_visibility: true,
+          unlimited_likes: true,
+          exclusive_filters: true,
+          priority_matching: true,
+          vip_badge: true,
+        }
+      : null,
+  });
+});
+
 exports.subscribeWithCoins = asyncHandler(async (req, res) => {
   const plan = await VipPlan.findByPk(req.body.vip_plan_id);
   if (!plan || !plan.is_active) return fail(res, "VIP plan not found", 404);

@@ -9,7 +9,10 @@ const {
 
 router.use(authenticateUser, requireAccountType("chatter"));
 router.get("/", incomeController.summary);
+router.get("/holds", incomeController.holds);
+router.get("/transactions", incomeController.transactions);
 router.get("/withdrawals", incomeController.history);
 router.post("/withdrawals", incomeController.withdraw);
+router.post("/release-due", incomeController.releaseDue);
 
 module.exports = router;

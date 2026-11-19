@@ -34,4 +34,21 @@ const markRead = async (userId, notificationId) => {
   return row;
 };
 
-module.exports = { createNotification, listForUser, markRead };
+const markAllRead = async (userId) => {
+  const [count] = await Notification.update(
+    { is_read: true, read_at: new Date() },
+    { where: { user_id: userId, is_read: false } }
+  );
+  return count;
+};
+
+const unreadCount = async (userId) =>
+  Notification.count({ where: { user_id: userId, is_read: false } });
+
+module.exports = {
+  createNotification,
+  listForUser,
+  markRead,
+  markAllRead,
+  unreadCount,
+};

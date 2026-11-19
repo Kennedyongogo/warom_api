@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
-const { Follow, Block, Swipe, Match } = require("../../models");
-const { orderedPair } = require("../../utils/warom/profile");
+const { Follow, Block, Swipe, Match, User } = require("../../models");
+const { orderedPair, publicProfile } = require("../../utils/warom/profile");
 const notificationService = require("../../services/warom/notificationService");
 const { ok, fail, asyncHandler } = require("../../utils/warom/response");
 
@@ -93,5 +93,33 @@ exports.listMatches = asyncHandler(async (req, res) => {
     },
     order: [["matched_at", "DESC"]],
   });
-  return ok(res, rows);
+  const otherIds = rows.map((m) =>
+    m.user_a_id === req.userId ? m.user_b_id : m.user_a_id
+  );
+  const users = await User.findAll({ where: { id: otherIds } });
+  const byId = Object.fromEntries(users.map((u) => [u.id, publicProfile(u)]));
+  return ok(
+    res,
+    rows.map((m) => ({
+      ...m.toJSON(),
+      other_user: byId[m.user_a_id === req.userId ? m.user_b_id : m.user_a_id] || null,
+    }))
+  );
+});
+
+exports.listBlocks = asyncHandler(async (req, res) => {
+  const rows = await Block.findAll({
+    where: { blocker_id: req.userId },
+    order: [["created_at", "DESC"]],
+  });
+  const ids = rows.map((r) => r.blocked_id);
+  const users = await User.findAll({ where: { id: ids } });
+  const byId = Object.fromEntries(users.map((u) => [u.id, publicProfile(u)]));
+  return ok(
+    res,
+    rows.map((r) => ({
+      ...r.toJSON(),
+      blocked_user: byId[r.blocked_id] || null,
+    }))
+  );
 });

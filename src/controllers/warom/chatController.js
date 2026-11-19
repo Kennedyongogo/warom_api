@@ -1,7 +1,9 @@
 const { Op } = require("sequelize");
-const { Conversation, Message } = require("../../models");
+const { Conversation, Message, User } = require("../../models");
 const { orderedPair } = require("../../utils/warom/profile");
 const notificationService = require("../../services/warom/notificationService");
+const monetizationService = require("../../services/warom/monetizationService");
+const { emitToUser, getIo } = require("../../realtime/socket");
 const { ok, fail, asyncHandler } = require("../../utils/warom/response");
 
 exports.listConversations = asyncHandler(async (req, res) => {
@@ -62,7 +64,36 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     body = null,
     media_url = null,
     gift_id = null,
+    coin_cost = null,
   } = req.body;
+
+  const peer = await monetizationService.resolvePeer(conversation, req.userId);
+  let charge = null;
+
+  // Users pay when messaging a chatter (or when an explicit coin_cost is provided).
+  const shouldCharge =
+    peer &&
+    peer.account_type === "chatter" &&
+    req.accountType === "user" &&
+    ["text", "voice", "photo", "video", "sticker", "gif"].includes(message_type);
+
+  if (shouldCharge) {
+    try {
+      charge = await monetizationService.chargeAndCreditChatter({
+        spender: req.user,
+        chatter: peer,
+        transactionType: "messaging",
+        coinCost:
+          Number(coin_cost) ||
+          monetizationService.defaultCostFor("messaging"),
+        referenceType: "messaging",
+        description: "Chat message",
+        metadata: { conversation_id: conversation.id },
+      });
+    } catch (err) {
+      return fail(res, err.message, 402);
+    }
+  }
 
   const message = await Message.create({
     conversation_id: conversation.id,
@@ -71,7 +102,13 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     body,
     media_url,
     gift_id,
+    coin_cost: charge ? charge.cost : 0,
+    is_paid_unlock: Boolean(charge),
   });
+
+  if (charge?.hold) {
+    await charge.hold.update({ source_id: message.id });
+  }
 
   await conversation.update({
     last_message_at: new Date(),
@@ -91,5 +128,40 @@ exports.sendMessage = asyncHandler(async (req, res) => {
     data: { conversation_id: conversation.id, message_id: message.id },
   });
 
+  const packed = { conversation_id: conversation.id, message };
+  try {
+    const io = getIo();
+    if (io) {
+      io.to(`conversation:${conversation.id}`).emit("chat:message", packed);
+      emitToUser(recipientId, "chat:message", packed);
+    }
+  } catch (_err) {
+    // realtime optional
+  }
+
   return ok(res, message, "Sent", 201);
+});
+
+exports.markRead = asyncHandler(async (req, res) => {
+  const conversation = await Conversation.findByPk(req.params.id);
+  if (!conversation) return fail(res, "Conversation not found", 404);
+  if (
+    ![conversation.participant_a_id, conversation.participant_b_id].includes(
+      req.userId
+    )
+  ) {
+    return fail(res, "Forbidden", 403);
+  }
+
+  const [count] = await Message.update(
+    { read_at: new Date() },
+    {
+      where: {
+        conversation_id: conversation.id,
+        sender_id: { [Op.ne]: req.userId },
+        read_at: null,
+      },
+    }
+  );
+  return ok(res, { marked: count });
 });

@@ -9,8 +9,18 @@ exports.list = asyncHandler(async (req, res) => {
   return ok(res, rows);
 });
 
+exports.unreadCount = asyncHandler(async (req, res) => {
+  const unread = await notificationService.unreadCount(req.userId);
+  return ok(res, { unread_count: unread });
+});
+
 exports.markRead = asyncHandler(async (req, res) => {
   const row = await notificationService.markRead(req.userId, req.params.id);
   if (!row) return fail(res, "Notification not found", 404);
   return ok(res, row, "Marked read");
+});
+
+exports.markAllRead = asyncHandler(async (req, res) => {
+  const count = await notificationService.markAllRead(req.userId);
+  return ok(res, { updated: count }, "All marked read");
 });

@@ -4,6 +4,7 @@ const cors = require("cors");
 const fs = require("fs");
 const { initializeModels, setupAssociations } = require("./models");
 const { errorHandler } = require("./middleware/errorHandler");
+const { seedDefaults } = require("./services/warom/seedDefaults");
 
 const authRoutes = require("./routes/warom/authRoutes");
 const profileRoutes = require("./routes/warom/profileRoutes");
@@ -18,6 +19,11 @@ const notificationRoutes = require("./routes/warom/notificationRoutes");
 const reportRoutes = require("./routes/warom/reportRoutes");
 const publicSiteRoutes = require("./routes/warom/publicSiteRoutes");
 const adminRoutes = require("./routes/warom/adminRoutes");
+const mediaRoutes = require("./routes/warom/mediaRoutes");
+const verificationRoutes = require("./routes/warom/verificationRoutes");
+const lockedPhotoRoutes = require("./routes/warom/lockedPhotoRoutes");
+const presenceRoutes = require("./routes/warom/presenceRoutes");
+const liveStreamRoutes = require("./routes/warom/liveStreamRoutes");
 
 const app = express();
 
@@ -38,6 +44,7 @@ const uploadDirs = [
   "chat-media",
   "gifts",
   "verifications",
+  "locked-photos",
   "reports",
   "misc",
 ].map((dir) => path.join(__dirname, "..", "uploads", dir));
@@ -63,13 +70,41 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/site", publicSiteRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/media", mediaRoutes);
+app.use("/api/verification", verificationRoutes);
+app.use("/api/locked-photos", lockedPhotoRoutes);
+app.use("/api/presence", presenceRoutes);
+app.use("/api/live-streams", liveStreamRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "WAROM API is running",
     timestamp: new Date().toISOString(),
-    version: "2.0.0-warom",
+    version: "2.2.0-warom",
+    features: [
+      "auth",
+      "social-login",
+      "profiles",
+      "privacy",
+      "social",
+      "discovery",
+      "chats",
+      "calls",
+      "live-streams",
+      "wallet",
+      "income",
+      "vip",
+      "notifications",
+      "media",
+      "verification",
+      "locked-photos",
+      "presence",
+      "device-tokens",
+      "reports",
+      "realtime-socket",
+      "admin-ops",
+    ],
   });
 });
 
@@ -90,6 +125,7 @@ const initializeApp = async () => {
   console.log("🚀 Initializing WAROM application...");
   await initializeModels();
   setupAssociations();
+  await seedDefaults();
   console.log("✅ WAROM application initialized");
   return true;
 };

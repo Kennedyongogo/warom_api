@@ -49,6 +49,7 @@ const discoverByLocation = async (viewerId, { country, city, limit = 40 } = {}) 
   const users = await User.findAll({
     where,
     order: [
+      ["is_vip", "DESC"],
       ["is_online", "DESC"],
       ["created_at", "DESC"],
     ],

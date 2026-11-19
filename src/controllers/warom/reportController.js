@@ -16,3 +16,12 @@ exports.create = asyncHandler(async (req, res) => {
   });
   return ok(res, report, "Report submitted", 201);
 });
+
+exports.mine = asyncHandler(async (req, res) => {
+  const rows = await Report.findAll({
+    where: { reporter_id: req.userId },
+    order: [["created_at", "DESC"]],
+    limit: Number(req.query.limit) || 50,
+  });
+  return ok(res, rows);
+});

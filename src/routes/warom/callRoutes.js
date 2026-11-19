@@ -6,6 +6,7 @@ const { authenticateUser } = require("../../middleware/warom/auth");
 
 router.use(authenticateUser);
 router.get("/history", callController.history);
+router.get("/missed", callController.missed);
 router.post("/start", callController.start);
 router.patch("/:id", callController.updateStatus);
 

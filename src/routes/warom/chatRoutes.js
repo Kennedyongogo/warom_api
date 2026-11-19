@@ -9,5 +9,6 @@ router.get("/", chatController.listConversations);
 router.post("/open", chatController.openConversation);
 router.get("/:id/messages", chatController.listMessages);
 router.post("/:id/messages", chatController.sendMessage);
+router.post("/:id/read", chatController.markRead);
 
 module.exports = router;

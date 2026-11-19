@@ -5,6 +5,13 @@ const profileController = require("../../controllers/warom/profileController");
 const { authenticateUser, optionalUserAuth } = require("../../middleware/warom/auth");
 
 router.get("/me/social", authenticateUser, profileController.mySocial);
+router.get("/me/visitors", authenticateUser, profileController.visitors);
+router.get("/me/followers", authenticateUser, profileController.followers);
+router.get("/me/following", authenticateUser, profileController.following);
+router.get("/me/matches", authenticateUser, profileController.matches);
+router.get("/me/gifts", authenticateUser, profileController.giftsReceived);
+router.get("/me/privacy", authenticateUser, profileController.getPrivacy);
+router.patch("/me/privacy", authenticateUser, profileController.updatePrivacy);
 router.patch("/me", authenticateUser, profileController.updateMe);
 router.post("/me/password", authenticateUser, profileController.changePassword);
 router.delete("/me", authenticateUser, profileController.deleteAccount);
