@@ -86,9 +86,11 @@ exports.updateStatus = asyncHandler(async (req, res) => {
     call.caller_id === req.userId ? call.callee_id : call.caller_id;
   emitToUser(peerId, "call:status", { call });
   if (signalling_payload) {
+    // Client listens for `signal` (same shape as socket `call:signal` relay).
     emitToUser(peerId, "call:signal", {
       call_id: call.id,
       from_user_id: req.userId,
+      signal: signalling_payload,
       signalling_payload,
     });
   }
