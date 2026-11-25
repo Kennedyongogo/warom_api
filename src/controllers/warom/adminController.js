@@ -330,6 +330,13 @@ exports.updateAdmin = asyncHandler(async (req, res) => {
   return ok(res, publicAdmin(admin), "Admin updated");
 });
 
+function avatarFromUser(json) {
+  if (json.profile_picture) return json.profile_picture;
+  if (Array.isArray(json.photos) && json.photos.length) return json.photos[0];
+  if (Array.isArray(json.cover_photos) && json.cover_photos.length) return json.cover_photos[0];
+  return null;
+}
+
 exports.getUser = asyncHandler(async (req, res) => {
   const user = await User.findByPk(req.params.id, {
     attributes: { exclude: ["password"] },
@@ -342,7 +349,7 @@ exports.getUser = asyncHandler(async (req, res) => {
     is_active: json.status === "active",
     last_login: json.last_active_at,
     createdAt: json.created_at || json.createdAt,
-    profile_image: json.profile_picture || null,
+    profile_image: avatarFromUser(json),
     role: json.account_type,
     _kind: "app",
   });

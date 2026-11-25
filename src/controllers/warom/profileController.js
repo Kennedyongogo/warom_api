@@ -10,6 +10,7 @@ const {
 const { publicProfile, orderedPair } = require("../../utils/warom/profile");
 const { ok, fail, asyncHandler } = require("../../utils/warom/response");
 const walletService = require("../../services/warom/walletService");
+const { hardDeleteUser } = require("../../services/warom/accountDeletionService");
 
 exports.updateMe = asyncHandler(async (req, res) => {
   const allowed = [
@@ -30,6 +31,10 @@ exports.updateMe = asyncHandler(async (req, res) => {
   const patch = {};
   for (const key of allowed) {
     if (req.body[key] !== undefined) patch[key] = req.body[key];
+  }
+  // Keep avatar in sync with the first gallery photo when one isn't set explicitly.
+  if (Array.isArray(patch.photos) && patch.photos.length && patch.profile_picture === undefined) {
+    patch.profile_picture = patch.photos[0];
   }
   await req.user.update(patch);
   return ok(res, publicProfile(req.user), "Profile updated");
@@ -155,13 +160,10 @@ exports.changePassword = asyncHandler(async (req, res) => {
 });
 
 exports.deleteAccount = asyncHandler(async (req, res) => {
-  await req.user.update({
-    status: "deleted",
-    email: null,
-    phone: null,
-    is_online: false,
-  });
-  return ok(res, null, "Account deleted");
+  const userId = req.userId;
+  const removed = await hardDeleteUser(userId);
+  if (!removed) return fail(res, "User not found", 404);
+  return ok(res, null, "Account permanently deleted");
 });
 
 exports.visitors = asyncHandler(async (req, res) => {
